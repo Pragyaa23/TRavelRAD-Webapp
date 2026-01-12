@@ -1,0 +1,7 @@
+{
+  "name": "TravelRAD - AI Travel Planner",
+  "description": "An AI-powered travel planning application that generates personalized itineraries based on your preferences using Gemini 3.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
