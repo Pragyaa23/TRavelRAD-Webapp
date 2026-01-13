@@ -14,11 +14,12 @@ const INTEREST_OPTIONS = [
 ];
 
 const BUDGET_OPTIONS = [
-  { label: 'Economy (Under ₹80,000)', value: 'Economy (< ₹80k)' },
-  { label: 'Mid-Range (₹80,000 - ₹2,50,000)', value: 'Mid-range (₹80k-₹2.5L)' },
-  { label: 'Standard (₹2,50,000 - ₹4,00,000)', value: 'Standard (₹2.5L-₹4L)' },
-  { label: 'Luxury (₹4,00,000 - ₹8,00,000)', value: 'Luxury (₹4L-₹8L)' },
-  { label: 'Ultra Luxury (Over ₹8,00,000)', value: 'Ultra Luxury (₹8L+)' },
+  { label: '₹20,000 – ₹40,000', value: '₹20,000 – ₹40,000' },
+  { label: '₹40,001 – ₹70,000', value: '₹40,001 – ₹70,000' },
+  { label: '₹70,001 – ₹1,00,000', value: '₹70,001 – ₹1,00,000' },
+  { label: '₹1,00,001 – ₹1,50,000', value: '₹1,00,001 – ₹1,50,000' },
+  { label: '₹1,50,001 – ₹2,00,000', value: '₹1,50,001 – ₹2,00,000' },
+  { label: 'I am flexible', value: 'Flexible' },
 ];
 
 const GROUP_SIZE_OPTIONS = ['3', '4', '5', '6', '7', '8', '9', '10', '10+'];
@@ -33,7 +34,7 @@ const INDIAN_CITIES = [
 const Logo = ({ className = "", vertical = false }: { className?: string, vertical?: boolean }) => {
   return (
     <div className={`flex ${vertical ? 'flex-col' : 'items-center'} gap-3 ${className}`}>
-      <div className="relative w-12 h-12 flex items-center justify-center">
+      <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
         {/* Concentric circles based on image */}
         <div className="absolute inset-0 border border-coral/40 rounded-full"></div>
         <div className="absolute inset-1 border border-coral/30 rounded-full scale-110 rotate-12"></div>
@@ -87,6 +88,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [itinerary, setItinerary] = useState<ItineraryResponse | null>(null);
+  const [emailTouched, setEmailTouched] = useState(false);
   
   const [prefs, setPrefs] = useState<TripPreferences>({
     fullName: '',
@@ -125,6 +127,8 @@ export default function App() {
     return String(email).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
   };
 
+  const isEmailValid = prefs.email === '' || validateEmail(prefs.email);
+
   const handleCityInput = (field: 'origin' | 'destination', value: string) => {
     setPrefs({ ...prefs, [field]: value });
     if (value.length > 0) {
@@ -162,10 +166,11 @@ export default function App() {
 
   const handleSubmit = async () => {
     setError(null);
+    setEmailTouched(true);
     
     if (!prefs.fullName.trim()) return setError("Full Name is mandatory.");
     if (!prefs.email.trim()) return setError("Email Address is mandatory.");
-    if (!validateEmail(prefs.email)) return setError("Please provide a valid email address.");
+    if (!validateEmail(prefs.email)) return setError("Please provide a valid email address format.");
     if (!prefs.origin.trim()) return setError("Origin city is mandatory.");
     if (!prefs.destination.trim()) return setError("Destination city is mandatory.");
     if (!prefs.startDate) return setError("Start Date is mandatory.");
@@ -236,7 +241,7 @@ export default function App() {
             <div className="max-w-xl mx-auto">
               <div className="text-center mb-16">
                 <span className="text-[10px] font-bold text-muted-grey tracking-[0.2em] uppercase">The TravelRAD Way</span>
-                <h2 className="text-4xl font-bold text-charcoal mt-2 tracking-tight">Smarter Plans, Faster.</h2>
+                <h2 className="text-4xl font-bold text-charcoal mt-2 tracking-tight">Plan Smarter</h2>
               </div>
               
               <div className="space-y-12">
@@ -245,13 +250,13 @@ export default function App() {
                   { title: "AI Radar Search", desc: "Our engine scans thousands of data points.", icon: "radar" },
                   { title: "Review & Book", desc: "Approve your custom itinerary instantly.", icon: "verified" }
                 ].map((step, i) => (
-                  <div key={i} className="flex gap-8 items-start relative">
-                    {i < 2 && <div className="absolute left-7 top-14 w-[2px] h-12 bg-coral/20"></div>}
-                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shrink-0 border border-warm-grey">
-                      <span className="material-symbols-outlined text-charcoal text-2xl">{step.icon}</span>
+                  <div key={i} className="flex gap-8 items-start relative group">
+                    {i < 2 && <div className="absolute left-7 top-14 w-[2px] h-12 bg-coral/20 group-hover:bg-primary-blue/20 transition-colors"></div>}
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shrink-0 border border-warm-grey group-hover:border-primary-blue group-hover:bg-primary-blue group-hover:scale-110 group-hover:shadow-primary-glow transition-all duration-300">
+                      <span className="material-symbols-outlined text-charcoal text-2xl group-hover:text-white transition-colors">{step.icon}</span>
                     </div>
                     <div className="pt-2">
-                      <h3 className="font-bold text-xl text-charcoal mb-1">{step.title}</h3>
+                      <h3 className="font-bold text-xl text-charcoal mb-1 group-hover:text-primary-blue transition-colors">{step.title}</h3>
                       <p className="text-muted-grey text-base font-medium opacity-70">{step.desc}</p>
                     </div>
                   </div>
@@ -297,10 +302,18 @@ export default function App() {
                     <input 
                       type="email" 
                       placeholder="your@email.com"
-                      className="w-full pl-14 pr-4 py-5 rounded-2xl bg-warm-grey/30 border border-warm-grey focus:ring-4 focus:ring-primary-blue/5 focus:border-primary-blue transition-all font-medium placeholder:text-hint"
+                      required
+                      className={`w-full pl-14 pr-4 py-5 rounded-2xl bg-warm-grey/30 border transition-all font-medium placeholder:text-hint focus:ring-4 ${emailTouched && !isEmailValid ? 'border-coral ring-coral/5 focus:border-coral' : 'border-warm-grey focus:ring-primary-blue/5 focus:border-primary-blue'}`}
                       value={prefs.email}
+                      onBlur={() => setEmailTouched(true)}
                       onChange={e => setPrefs({...prefs, email: e.target.value})}
                     />
+                    {emailTouched && !isEmailValid && (
+                      <p className="mt-2 text-xs text-charcoal/60 font-medium px-2 flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1">
+                        <span className="material-symbols-outlined text-[14px]">info</span>
+                        Please enter a valid email format (e.g., name@domain.com)
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -390,7 +403,7 @@ export default function App() {
                 </div>
 
                 <label className="flex items-center gap-4 cursor-pointer group">
-                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${prefs.returnTransport ? 'bg-primary-blue border-primary-blue' : 'bg-white border-warm-grey'}`}>
+                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${prefs.returnTransport ? 'bg-primary-blue border-primary-blue' : 'bg-white border-warm-grey group-hover:border-primary-blue'}`}>
                     {prefs.returnTransport && <span className="material-symbols-outlined text-white text-base">check</span>}
                     <input 
                       type="checkbox" 
@@ -399,7 +412,7 @@ export default function App() {
                       onChange={() => setPrefs({...prefs, returnTransport: !prefs.returnTransport})}
                     />
                   </div>
-                  <span className="text-sm font-semibold text-muted-grey">I will need return transportation as well</span>
+                  <span className="text-sm font-semibold text-muted-grey group-hover:text-primary-blue transition-colors">I will need return transportation as well</span>
                 </label>
 
                 <div>
@@ -501,7 +514,7 @@ export default function App() {
                 </div>
 
                 <label className="flex items-start gap-5 cursor-pointer group mt-16">
-                   <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${termsAgreed ? 'bg-primary-blue border-primary-blue' : 'bg-white border-warm-grey'}`}>
+                   <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${termsAgreed ? 'bg-primary-blue border-primary-blue' : 'bg-white border-warm-grey group-hover:border-primary-blue'}`}>
                     {termsAgreed && <span className="material-symbols-outlined text-white text-lg">check</span>}
                     <input 
                       type="checkbox" 
@@ -510,7 +523,7 @@ export default function App() {
                       onChange={() => setTermsAgreed(!termsAgreed)}
                     />
                   </div>
-                  <span className="text-[12px] font-medium text-muted-grey leading-relaxed">
+                  <span className="text-[12px] font-medium text-muted-grey leading-relaxed group-hover:text-primary-blue transition-colors">
                     I agree to allow TravelRAD to process my data to generate high-precision, AI-optimized travel itineraries based on my profile.
                   </span>
                 </label>
